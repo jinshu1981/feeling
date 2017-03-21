@@ -1,0 +1,54 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.jinshu.xuzhi.feeling.FragmentBoxing">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id = "@+id/colorBallLayout">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id = "@+id/backGroundImage"
+            android:layout_centerHorizontal="true"
+            android:src = "@drawable/mouse4"
+            android:layout_centerVertical="true"
+            />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id = "@+id/backGroundImage1"
+            android:layout_centerHorizontal="true"
+            android:src = "@drawable/mouse4"
+            android:layout_centerVertical="true"
+            android:visibility="gone"
+            />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src = "@drawable/dialog3"
+            android:id = "@+id/dialog"
+            android:layout_above="@id/backGroundImage"
+            android:layout_centerHorizontal="true"
+            android:alpha = "0"/>
+       <!-- <View
+            android:layout_width="match_parent"
+            android:layout_height="1sp"
+            android:background="@color/blue"
+            android:layout_alignBottom="@id/backGroundImage"/>-->
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src = "@drawable/punch1"
+            android:id = "@+id/punch"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"/>
+
+    </RelativeLayout>
+
+
+</FrameLayout>

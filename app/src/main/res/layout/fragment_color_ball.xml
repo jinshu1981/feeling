@@ -1,0 +1,54 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.jinshu.xuzhi.feeling.FragmentColorBall"
+  >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id = "@+id/colorBallLayout">
+
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src = "@drawable/angrypig1"
+            android:id = "@+id/feelingImage"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src = "@drawable/dialog1"
+            android:id = "@+id/dialog"
+            android:layout_above="@id/feelingImage"
+            android:layout_centerHorizontal="true"
+            android:alpha = "0"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src = "@drawable/ballpurple"
+            android:id = "@+id/colorballLeft"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src = "@drawable/ballgreen"
+            android:id = "@+id/colorballCenter"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src = "@drawable/ballyellow"
+            android:id = "@+id/colorballRight"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"/>
+
+    </RelativeLayout>
+
+
+</FrameLayout>
