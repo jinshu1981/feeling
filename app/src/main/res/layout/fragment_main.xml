@@ -11,13 +11,21 @@
     tools:context="com.jinshu.xuzhi.feeling.MainActivityFragment">
 
     <ImageView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_centerHorizontal="true"
+    android:layout_centerVertical="true"
+    android:src = "@drawable/angrypig1"
+    android:id = "@+id/feelingImage"
+    android:visibility="visible"/>
+    <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:src = "@drawable/angrypig1"
-        android:id = "@+id/feelingImage"
-        android:visibility="visible"/>
+        android:src = "@drawable/circle"
+        android:id = "@+id/circle"
+        android:visibility="gone"/>
 
     <ImageView
         android:layout_width="wrap_content"
@@ -25,15 +33,15 @@
         android:src = "@drawable/ballpurple"
         android:id = "@+id/optionLeft"
         android:layout_centerVertical="true"
-        android:layout_alignParentLeft="true"
+        android:layout_alignLeft="@id/circle"
         android:visibility="gone"/>
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src = "@drawable/boxing4"
         android:id = "@+id/optionCenter"
-        android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
+        android:layout_alignTop="@id/circle"
         android:visibility="gone"/>
     <ImageView
         android:layout_width="wrap_content"
@@ -41,7 +49,7 @@
         android:src = "@drawable/fishicon2"
         android:id = "@+id/optionRight"
         android:layout_centerVertical="true"
-        android:layout_alignParentRight="true"
+        android:layout_alignRight="@id/circle"
         android:visibility="gone"/>
 
     <ImageView
@@ -49,7 +57,7 @@
         android:layout_height="wrap_content"
         android:src = "@drawable/angrypig2"
         android:id = "@+id/customPicture"
-        android:layout_alignParentBottom="true"
+        android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
         android:visibility="gone"/>
 

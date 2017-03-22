@@ -4,6 +4,7 @@ package com.jinshu.xuzhi.feeling;
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -18,11 +19,14 @@ import android.view.animation.BounceInterpolator;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Random;
+
+import static com.jinshu.xuzhi.feeling.MainActivityFragment.getTempUri;
 
 
 /**
@@ -135,6 +139,23 @@ public class FragmentColorBall extends Fragment {
         colorBallRight.setTag(R.drawable.ballyellow);
 
         target = (ImageView)mRootView.findViewById(R.id.feelingImage);
+
+        if (getTempUri() != null)
+        {
+
+            Bitmap bitmap = null;
+            try {
+                // 先通过getContentResolver方法获得一个ContentResolver实例，
+                // 调用openInputStream(Uri)方法获得uri关联的数据流stream
+                // 把上一步获得的数据流解析成为bitmap
+                bitmap = BitmapFactory.decodeStream(getActivity().getContentResolver().openInputStream(getTempUri()));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                return null;
+            }
+            // 把解析到的位图显示出来
+            target.setImageBitmap(bitmap);
+        }
 
         colorBallLeft.setOnClickListener(new ColorBallClickListener());
         colorBallCenter.setOnClickListener(new ColorBallClickListener());

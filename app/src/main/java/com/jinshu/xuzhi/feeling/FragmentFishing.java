@@ -25,10 +25,12 @@ import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
+import static com.jinshu.xuzhi.feeling.MainActivityFragment.getTempUri;
 import static java.lang.Math.abs;
 import static java.lang.Math.min;
 import static java.lang.Math.random;
@@ -330,14 +332,29 @@ public class FragmentFishing extends Fragment {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        if (getTempUri() != null)
+        {
 
+            Bitmap bitmap = null;
+            try {
+                // 先通过getContentResolver方法获得一个ContentResolver实例，
+                // 调用openInputStream(Uri)方法获得uri关联的数据流stream
+                // 把上一步获得的数据流解析成为bitmap
+                bitmap = BitmapFactory.decodeStream(getActivity().getContentResolver().openInputStream(getTempUri()));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                return null;
+            }
+            // 设置缩放过的图片为foreground图片
+            imageForeground = MainActivityFragment.zoomImg(bitmap,70,70);
+        }
 
         mergeImage = Bitmap.createBitmap(imageBackground.getWidth(), imageBackground.getHeight(), Bitmap.Config.ARGB_8888);
 
         Canvas comboImage = new Canvas(mergeImage);
 
         Paint paint = new Paint();
-        paint.setAlpha(200);
+        paint.setAlpha(100);
         comboImage.drawBitmap(imageBackground, 0f, 0f, null);
         comboImage.drawBitmap(imageForeground, (imageBackground.getWidth()/2 - imageForeground.getWidth()/2), (imageBackground.getHeight() - imageForeground.getHeight() - 20), paint);
 
@@ -396,10 +413,9 @@ public class FragmentFishing extends Fragment {
      }
     @Override
     public void onDestroy() {
-        mpBubble.release();
-        mpYisell.release();
+        if (mpBubble.isPlaying()) mpBubble.release();
+        if (mpYisell.isPlaying()) mpYisell.release();
         Log.v(LOG_TAG, "onDestroy");
         super.onDestroy();
-
     }
 }

@@ -8,14 +8,15 @@
         android:layout_height="wrap_content"
         android:id = "@+id/fishingLayout"
         android:background="@color/deepskyblue">
-
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src = "@drawable/coral4"
+            android:src = "@drawable/coral7"
             android:id = "@+id/coral"
             android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"/>
+            android:layout_centerHorizontal="true"
+            />
+
 
         <ImageView
             android:layout_width="wrap_content"
@@ -65,6 +66,7 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_marginTop="29dp" />
+
 
     </RelativeLayout>
 

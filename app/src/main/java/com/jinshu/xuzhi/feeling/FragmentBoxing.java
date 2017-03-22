@@ -25,7 +25,10 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+
+import static com.jinshu.xuzhi.feeling.MainActivityFragment.getTempUri;
 
 
 /**
@@ -250,6 +253,22 @@ public class FragmentBoxing extends Fragment {
             e.printStackTrace();
         }
 
+        if (getTempUri() != null)
+        {
+
+            Bitmap bitmap = null;
+            try {
+                // 先通过getContentResolver方法获得一个ContentResolver实例，
+                // 调用openInputStream(Uri)方法获得uri关联的数据流stream
+                // 把上一步获得的数据流解析成为bitmap
+                bitmap = BitmapFactory.decodeStream(getActivity().getContentResolver().openInputStream(getTempUri()));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                return null;
+            }
+            // 设置缩放过的图片为forground图片
+            imageForeground = MainActivityFragment.zoomImg(bitmap,180,180);
+        }
 
         mergeImage = Bitmap.createBitmap(imageBackground.getWidth(), imageBackground.getHeight(), Bitmap.Config.ARGB_8888);
 
