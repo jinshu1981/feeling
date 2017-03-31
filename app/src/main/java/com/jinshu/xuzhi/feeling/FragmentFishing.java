@@ -12,10 +12,12 @@ import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
-import android.util.DisplayMetrics;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -25,12 +27,17 @@ import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
-import static com.jinshu.xuzhi.feeling.MainActivityFragment.getTempUri;
+import static com.jinshu.xuzhi.feeling.Util.CONSTANTS_RES_PREFIX;
+import static com.jinshu.xuzhi.feeling.Util.IMAGE_FILE_NAME;
+import static com.jinshu.xuzhi.feeling.Util.mScreenHeight;
+import static com.jinshu.xuzhi.feeling.Util.mScreenWidth;
+import static com.jinshu.xuzhi.feeling.Util.zoomImg;
 import static java.lang.Math.abs;
 import static java.lang.Math.min;
 import static java.lang.Math.random;
@@ -41,10 +48,9 @@ import static java.lang.Math.random;
  */
 public class FragmentFishing extends Fragment {
     private static View mRootView;
-    private static ImageView fish1,fish2,fish3,fish4,fish5,fishHook;
+    private static ImageView fish1,fish2,fish3,fish4,fish5,fish6,fishHook,backArrow;
     static ObjectAnimator bubblePopUp,popUpAfterMove;
     static AnimatorSet set;
-    private static int mScreenWidth,mScreenHeight;
     private static  BitmapFactory.Options opt;
     private static ArrayList<Fish> mFishList= new ArrayList<Fish>();;
     private final  String LOG_TAG = this.getClass().getSimpleName();
@@ -52,31 +58,31 @@ public class FragmentFishing extends Fragment {
     private static RelativeLayout mFishingLayout;
     static FragmentFishing mThis;
     static Bitmap mTarget;
-    static final MediaPlayer mpBubble  = new MediaPlayer();
-    static final MediaPlayer mpYisell = new MediaPlayer();
-    static String CONSTANTS_RES_PREFIX = "android.resource://com.jinshu.xuzhi.feeling/";
+    static final MediaPlayer mpBubble  = new MediaPlayer(),mpEnough = new MediaPlayer();
     private class Fish{
         int resourceId = 0;
-        int sharkId = 0;
+        Boolean goRight = true;
         ImageView fishView = null;
         boolean beShark = false;
 
-        Fish(ImageView fishView,int resourceId,int sharkId){
+        Fish(ImageView fishView,int resourceId,Boolean goRight){
 
             this.fishView = fishView;
             this.resourceId = resourceId;
-            this.sharkId = sharkId;
             this.beShark = false;
+            this.goRight = goRight;
         }
     }
+    /*0.5s repeat timer*/
     static Handler handler = new Handler() {
         public void handleMessage(Message msg) {
-            /*if fish touch the fishhook ,bite it*/
+
+            /*if fish meet the bubble ,bite it*/
             int x = (int)(fishHook.getX() + fishHook.getWidth()/2);
             int y =  (int)(fishHook.getY() + fishHook.getHeight()/2);
             for (Fish fish:mFishList)
             {
-                biteTheHook(fish,x,y);
+                biteTheBubble(fish,x,y);
             }
 
             super.handleMessage(msg);
@@ -99,34 +105,26 @@ public class FragmentFishing extends Fragment {
         fish3 = (ImageView)mRootView.findViewById(R.id.fish3);
         fish4 = (ImageView)mRootView.findViewById(R.id.fish4);
         fish5 = (ImageView)mRootView.findViewById(R.id.fish5);
+        fish6 = (ImageView)mRootView.findViewById(R.id.fish6);
+        backArrow = (ImageView)mRootView.findViewById(R.id.arrowback);
         mFishingLayout = (RelativeLayout)mRootView.findViewById(R.id.fishingLayout);
-        mFishList.add(new Fish(fish1,R.drawable.fishicon,R.drawable.sharkright));
-        mFishList.add(new Fish(fish5,R.drawable.fishpink,R.drawable.sharkright));
-        mFishList.add(new Fish(fish2,R.drawable.fishicon1,R.drawable.sharkleft));
-        mFishList.add(new Fish(fish3,R.drawable.fishicon2,R.drawable.sharkleft));
-        mFishList.add(new Fish(fish4,R.drawable.fishblue,R.drawable.sharkleft));
+        mFishList.add(new Fish(fish1,R.drawable.fish1,true));
+        mFishList.add(new Fish(fish2,R.drawable.fish2,false));
+        mFishList.add(new Fish(fish3,R.drawable.fish3,false));
+        mFishList.add(new Fish(fish4,R.drawable.fish4,false));
+        mFishList.add(new Fish(fish5,R.drawable.fish5,true));
+        mFishList.add(new Fish(fish6,R.drawable.fish6,true));
 
         fishHook = (ImageView)mRootView.findViewById(R.id.fishhook);
-        mTarget = combineImages(R.drawable.bubble60,R.drawable.angrypig3);
+        mTarget = combineImages(R.drawable.bubble60,R.drawable.example40);
         fishHook.setImageBitmap(mTarget);
         fishHook.setTag("fishHook");
 
-
-        DisplayMetrics outMetrics = new DisplayMetrics();
-        getActivity().getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
-
         opt = new BitmapFactory.Options();
-        mScreenWidth = outMetrics.widthPixels;
-        mScreenHeight = outMetrics.heightPixels;
-        //Log.v(LOG_TAG,"mScreenWidth = " + mScreenWidth + ",mScreenHeight = " + mScreenHeight);
         opt.inJustDecodeBounds = true;
-        startFishSwimAnimation(R.drawable.fishicon,fish1,"L");
-        startFishSwimAnimation(R.drawable.fishpink,fish5,"L");
-        startFishSwimAnimation(R.drawable.fishicon1,fish2,"R");
-        startFishSwimAnimation(R.drawable.fishicon2,fish3,"R");
-        startFishSwimAnimation(R.drawable.fishblue,fish4,"R");
+
+        StartFishAnimation();
         bubblePopUp = ObjectAnimator.ofFloat(fishHook,"Y",mScreenHeight + 40,0).setDuration((mScreenHeight + 40)*10);
-        //Log.v(LOG_TAG,"bubblePopUp duration" + (mScreenHeight + 40));
         bubblePopUp.start();
         new Thread(new MyThread()).start();
         mpBubble.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -134,7 +132,7 @@ public class FragmentFishing extends Fragment {
                 mp.start();
             }
         });
-        mpYisell.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+        mpEnough.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             public void onPrepared(MediaPlayer mp) {
                 mp.start();
             }
@@ -171,7 +169,6 @@ public class FragmentFishing extends Fragment {
                             @Override
                             public void onAnimationEnd(Animator animator) {
                                 popUpAfterMove = ObjectAnimator.ofFloat(fishHook,"Y",0).setDuration((long)abs(fishHook.getY()) * 10);
-
                                 popUpAfterMove.start();
 
                             }
@@ -195,20 +192,36 @@ public class FragmentFishing extends Fragment {
             }
         });
 
+        backArrow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Fragment f = getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment);
+                if (f instanceof com.jinshu.xuzhi.feeling.MenuFragment) {
+                    return;
+                }
+                Fragment fragment = new com.jinshu.xuzhi.feeling.MenuFragment();
+                FragmentManager manager = getActivity().getSupportFragmentManager();
+                FragmentTransaction transaction = manager.beginTransaction();
+                transaction.replace(R.id.fragment, fragment);
+                transaction.commit();
+            }
+        });
         return mRootView;
     }
 
-
-    void startFishSwimAnimation(int drawableId,final ImageView fish,String startPoint)
+    int getRandomDuration()
+    {
+        return (int)((new Random().nextInt(10) + 4) * 1000);
+    }
+    void startFishSwimAnimation(int drawableId,final ImageView fish,Boolean goRight)
     {
         BitmapFactory.decodeResource(getResources(), drawableId, opt);
-        int duration = (int)((new Random().nextInt(5) + 5) * 1000);
         /******************define animation ***********************/
         /*from left to right*/
-        final ObjectAnimator swim2Right = ObjectAnimator.ofFloat(fish,"X",(float)(-opt.outWidth *2), (float)(mScreenWidth + opt.outWidth *2)).setDuration(duration);
+        final ObjectAnimator swim2Right = ObjectAnimator.ofFloat(fish,"X",(float)(-opt.outWidth *4), (float)(mScreenWidth + opt.outWidth *4));
         swim2Right.setInterpolator(new LinearInterpolator());
         /*from right to left*/
-        final ObjectAnimator swim2Left = ObjectAnimator.ofFloat(fish,"X", (float)(mScreenWidth + opt.outWidth *2),(float)(-opt.outWidth *2)).setDuration(duration);
+        final ObjectAnimator swim2Left = ObjectAnimator.ofFloat(fish,"X", (float)(mScreenWidth + opt.outWidth *4),(float)(-opt.outWidth *4));
         swim2Left.setInterpolator(new LinearInterpolator());
         /*turn*/
         final ObjectAnimator turn180Degree = ObjectAnimator.ofFloat(fish, "rotationY", 0.0F, 180.0F);
@@ -266,6 +279,7 @@ public class FragmentFishing extends Fragment {
 
             @Override
             public void onAnimationEnd(Animator animator) {
+                swim2Right.setDuration(getRandomDuration());
                 swim2Right.start();
             }
 
@@ -287,6 +301,7 @@ public class FragmentFishing extends Fragment {
 
             @Override
             public void onAnimationEnd(Animator animator) {
+                swim2Left.setDuration(getRandomDuration());
                 swim2Left.start();
             }
 
@@ -302,12 +317,13 @@ public class FragmentFishing extends Fragment {
         };
 
         /*setup listeners and start animation*/
-        if (startPoint.equals("L")) {
+        if (goRight) {
 
             swim2Right.addListener(turn180DegreeListener);
             turn180Degree.addListener(swim2LeftListener);
             swim2Left.addListener(turnBackListener);
             turnBack.addListener(swim2RightListener);
+            swim2Right.setDuration(getRandomDuration());
             swim2Right.start();
         }
         else
@@ -316,8 +332,15 @@ public class FragmentFishing extends Fragment {
             turn180Degree.addListener(swim2RightListener);
             swim2Right.addListener(turnBackListener);
             turnBack.addListener(swim2LeftListener);
+            swim2Left.setDuration(getRandomDuration());
             swim2Left.start();
 
+        }
+    }
+    void StartFishAnimation(){
+        for (Fish fish:mFishList)
+        {
+            startFishSwimAnimation(fish.resourceId,fish.fishView,fish.goRight);
         }
     }
     private Bitmap combineImages(int backgroundId, int  foregroundId)
@@ -332,7 +355,8 @@ public class FragmentFishing extends Fragment {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (getTempUri() != null)
+        File file = new File(Environment.getExternalStorageDirectory(), IMAGE_FILE_NAME);
+        if (file.exists())
         {
 
             Bitmap bitmap = null;
@@ -340,13 +364,13 @@ public class FragmentFishing extends Fragment {
                 // 先通过getContentResolver方法获得一个ContentResolver实例，
                 // 调用openInputStream(Uri)方法获得uri关联的数据流stream
                 // 把上一步获得的数据流解析成为bitmap
-                bitmap = BitmapFactory.decodeStream(getActivity().getContentResolver().openInputStream(getTempUri()));
+                bitmap = BitmapFactory.decodeStream(getActivity().getContentResolver().openInputStream(Uri.fromFile(file)));
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
                 return null;
             }
             // 设置缩放过的图片为foreground图片
-            imageForeground = MainActivityFragment.zoomImg(bitmap,70,70);
+            imageForeground = zoomImg(bitmap,70,70);
         }
 
         mergeImage = Bitmap.createBitmap(imageBackground.getWidth(), imageBackground.getHeight(), Bitmap.Config.ARGB_8888);
@@ -360,12 +384,13 @@ public class FragmentFishing extends Fragment {
 
         return mergeImage;
     }
-     public static void biteTheHook(Fish fish,int x,int y)
+     public static void biteTheBubble(Fish fish,int x,int y)
      {
          ImageView fishView = fish.fishView;
+         int sharkId = fish.goRight?R.drawable.sharkright:R.drawable.sharkleft;
          if ((abs((fishView.getX()+ fishView.getWidth()/2) - x) < 40) && (abs((fishView.getY() + fishView.getHeight()/2) - y) < 40))
          {
-             fishView.setImageResource(fish.sharkId);
+             fishView.setImageResource(sharkId);
              fish.beShark = true;
              /*delete fishhook view ,play audio,popup a new fishhook*/
              ImageView fishhook = (ImageView) mRootView.findViewWithTag("fishHook");
@@ -400,12 +425,12 @@ public class FragmentFishing extends Fragment {
              fishView.setImageResource(fish.resourceId);
              fish.beShark = false;
              try {
-                 mpYisell.reset();
+                 mpEnough.reset();
                  int id = mThis.getActivity().getResources().getIdentifier("yisell", "raw", "com.jinshu.xuzhi.feeling");
                  String uriString = CONSTANTS_RES_PREFIX + Integer.toString(id);
                  //Log.v(LOG_TAG,uriString);
-                 mpYisell.setDataSource(mThis.getActivity(), Uri.parse(uriString));
-                 mpYisell.prepareAsync();
+                 mpEnough.setDataSource(mThis.getActivity(), Uri.parse(uriString));
+                 mpEnough.prepareAsync();
              } catch (IOException e) {
                  e.printStackTrace();
              }
@@ -413,8 +438,8 @@ public class FragmentFishing extends Fragment {
      }
     @Override
     public void onDestroy() {
-        if (mpBubble.isPlaying()) mpBubble.release();
-        if (mpYisell.isPlaying()) mpYisell.release();
+        mpBubble.release();
+        mpEnough.release();
         Log.v(LOG_TAG, "onDestroy");
         super.onDestroy();
     }

@@ -1,54 +1,71 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.jinshu.xuzhi.feeling.FragmentBoxing">
-
+    tools:context="com.jinshu.xuzhi.feeling.FragmentBoxing"
+    android:background="@drawable/backgroundboxing">
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src = "@drawable/arrowleft6"
+        android:id = "@+id/arrowback"
+        android:layout_alignParentTop="true"></ImageView>
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id = "@+id/colorBallLayout">
+        android:id = "@+id/colorBallLayout"
+        android:layout_below="@id/arrowback"
+        android:background="@drawable/background13"
+        android:layout_centerInParent="true">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src = "@drawable/watcher"
+            android:id = "@+id/watcher"
+            android:layout_alignParentBottom="true"/>
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id = "@+id/backGroundImage"
             android:layout_centerHorizontal="true"
-            android:src = "@drawable/mouse4"
-            android:layout_centerVertical="true"
+            android:layout_above="@id/watcher"
+            android:src = "@drawable/mouse555"
             />
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id = "@+id/backGroundImage1"
             android:layout_centerHorizontal="true"
-            android:src = "@drawable/mouse4"
-            android:layout_centerVertical="true"
+            android:layout_above="@id/watcher"
+            android:src = "@drawable/mouse555"
             android:visibility="gone"
             />
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src = "@drawable/dialog3"
-            android:id = "@+id/dialog"
-            android:layout_above="@id/backGroundImage"
-            android:layout_centerHorizontal="true"
-            android:alpha = "0"/>
-       <!-- <View
             android:layout_width="match_parent"
-            android:layout_height="1sp"
-            android:background="@color/blue"
-            android:layout_alignBottom="@id/backGroundImage"/>-->
-
+            android:layout_height="wrap_content"
+            android:src = "@drawable/watcher"
+            android:layout_alignParentBottom="true"/>
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src = "@drawable/punch1"
             android:id = "@+id/punch"
+            android:layout_alignLeft="@id/backGroundImage"
             android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"/>
+            android:visibility="gone"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src = "@drawable/dialog3"
+            android:id = "@+id/dialog"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:alpha = "0"/>
+
 
     </RelativeLayout>
 
 
-</FrameLayout>
+
+</RelativeLayout>

@@ -3,21 +3,36 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.jinshu.xuzhi.feeling.FragmentColorBall"
+    android:background="@drawable/background6"
   >
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id = "@+id/colorBallLayout">
-
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src = "@drawable/arrowleft4"
+            android:id = "@+id/arrowback"
+            android:layout_alignParentTop="true"></ImageView>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src = "@drawable/ballphotoframe3"
+            android:id = "@+id/ballphotoframe"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            />
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src = "@drawable/angrypig1"
+            android:src = "@drawable/example200"
             android:id = "@+id/feelingImage"
             android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"/>
+            android:layout_centerVertical="true"
+            />
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

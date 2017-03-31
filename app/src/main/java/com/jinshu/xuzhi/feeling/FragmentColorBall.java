@@ -4,13 +4,12 @@ package com.jinshu.xuzhi.feeling;
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.DisplayMetrics;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,14 +18,13 @@ import android.view.animation.BounceInterpolator;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Random;
 
-import static com.jinshu.xuzhi.feeling.MainActivityFragment.getTempUri;
+import static com.jinshu.xuzhi.feeling.Util.PlayAudio;
+import static com.jinshu.xuzhi.feeling.Util.ShowCustomPicture;
 
 
 /**
@@ -34,11 +32,10 @@ import static com.jinshu.xuzhi.feeling.MainActivityFragment.getTempUri;
  */
 public class FragmentColorBall extends Fragment {
 
-    private static int mScreenWidth,mScreenHeight;
     private static LinkedList<ColorBallCoordinates> mColorBallCoordinatesList;
     private static ArrayList<ColorDirtyPair> mColorDirtyPairList;
     private static View mRootView;
-    private static ImageView target, dialog;
+    private static ImageView target, dialog,colorBallLeft,colorBallCenter,colorBallRight,backArrow;
     private static RelativeLayout mColorBallLayout;
     private static  BitmapFactory.Options opt;
     private static int TotalClickTime = 0;
@@ -50,9 +47,7 @@ public class FragmentColorBall extends Fragment {
     };
     private static float targetX,targetY;
     private final String LOG_TAG = this.getClass().getSimpleName();
-    final MediaPlayer mpBall  = new MediaPlayer();
-    final MediaPlayer mpWater = new MediaPlayer();
-    final String CONSTANTS_RES_PREFIX = "android.resource://com.jinshu.xuzhi.feeling/";
+    final MediaPlayer mpBall  = new MediaPlayer(),mpWater = new MediaPlayer();
     public FragmentColorBall() {
         // Required empty public constructor
         mColorBallCoordinatesList = new LinkedList<ColorBallCoordinates>();
@@ -120,47 +115,42 @@ public class FragmentColorBall extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-
         mRootView = inflater.inflate(R.layout.fragment_color_ball, container, false);
-        mColorBallLayout =  (RelativeLayout) mRootView.findViewById(R.id.colorBallLayout);
-        DisplayMetrics outMetrics = new DisplayMetrics();
-        getActivity().getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
 
-        opt = new BitmapFactory.Options();
-        mScreenWidth = outMetrics.widthPixels;
-        mScreenHeight = outMetrics.heightPixels;
-        Log.v(LOG_TAG,"mScreenWidth = " + mScreenWidth + ",mScreenHeight = " + mScreenHeight);
-        final ImageView colorBallLeft = (ImageView)mRootView.findViewById(R.id.colorballLeft);
-        final ImageView colorBallCenter = (ImageView)mRootView.findViewById(R.id.colorballCenter);
-        final ImageView colorBallRight = (ImageView)mRootView.findViewById(R.id.colorballRight);
-         dialog = (ImageView)mRootView.findViewById(R.id.dialog);
+        mColorBallLayout =  (RelativeLayout) mRootView.findViewById(R.id.colorBallLayout);
+        colorBallLeft = (ImageView)mRootView.findViewById(R.id.colorballLeft);
+        colorBallCenter = (ImageView)mRootView.findViewById(R.id.colorballCenter);
+        colorBallRight = (ImageView)mRootView.findViewById(R.id.colorballRight);
+        dialog = (ImageView)mRootView.findViewById(R.id.dialog);
+        target = (ImageView)mRootView.findViewById(R.id.feelingImage);
+        backArrow = (ImageView)mRootView.findViewById(R.id.arrowback);
+
+        ShowCustomPicture(getActivity(),target,0);
         colorBallLeft.setTag(R.drawable.ballpurple);
         colorBallCenter.setTag(R.drawable.ballgreen);
         colorBallRight.setTag(R.drawable.ballyellow);
 
-        target = (ImageView)mRootView.findViewById(R.id.feelingImage);
 
-        if (getTempUri() != null)
-        {
-
-            Bitmap bitmap = null;
-            try {
-                // 先通过getContentResolver方法获得一个ContentResolver实例，
-                // 调用openInputStream(Uri)方法获得uri关联的数据流stream
-                // 把上一步获得的数据流解析成为bitmap
-                bitmap = BitmapFactory.decodeStream(getActivity().getContentResolver().openInputStream(getTempUri()));
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-                return null;
-            }
-            // 把解析到的位图显示出来
-            target.setImageBitmap(bitmap);
-        }
+        opt = new BitmapFactory.Options();
 
         colorBallLeft.setOnClickListener(new ColorBallClickListener());
         colorBallCenter.setOnClickListener(new ColorBallClickListener());
         colorBallRight.setOnClickListener(new ColorBallClickListener());
 
+        backArrow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Fragment f = getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment);
+                if (f instanceof com.jinshu.xuzhi.feeling.MenuFragment) {
+                    return;
+                }
+                Fragment fragment = new com.jinshu.xuzhi.feeling.MenuFragment();
+                FragmentManager manager = getActivity().getSupportFragmentManager();
+                FragmentTransaction transaction = manager.beginTransaction();
+                transaction.replace(R.id.fragment, fragment);
+                transaction.commit();
+            }
+        });
         mpBall.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             public void onPrepared(MediaPlayer mp) {
                 mp.start();
@@ -182,11 +172,12 @@ public class FragmentColorBall extends Fragment {
             int yScale = target.getHeight();
             Log.v(LOG_TAG,"xScale = " + xScale + ",yScale = " + yScale);
             Log.v(LOG_TAG,"target x = " + target.getX() + ",target y = " + target.getY());
-            /*store ball coordinates*/
+            /*store ball coordinates for future add new ball*/
             mColorBallCoordinatesList.add(new ColorBallCoordinates(view.getX(),view.getY()));
 
-            targetX = (float)(target.getX()+ Math.random() * xScale);
-            targetY = (float)(target.getY()+ Math.random() * yScale);
+            /*generate ball destination coordinate*/
+            targetX = (float)(target.getX()+ Math.random() * (xScale-20));
+            targetY = (float)(target.getY()+ Math.random() * (yScale-20));//-20 避免球总打到下面
             Log.v(LOG_TAG,"targetX = " + targetX + ",targetY = " + targetY);
             ObjectAnimator clickBally = ObjectAnimator.ofFloat(view,"Y",targetY).setDuration(500);
             ObjectAnimator clickBallx = ObjectAnimator.ofFloat(view,"X", targetX).setDuration(500);
@@ -198,29 +189,17 @@ public class FragmentColorBall extends Fragment {
             set.addListener(new Animator.AnimatorListener() {
                 @Override
                 public void onAnimationStart(Animator animator) {
-                    //play ball audio
-                    try {
-                        mpBall.reset();
-                        int id = getActivity().getResources().getIdentifier("ball1", "raw", "com.jinshu.xuzhi.feeling");
-                        String uriString = CONSTANTS_RES_PREFIX + Integer.toString(id);
-                        Log.v(LOG_TAG,uriString);
-                        mpBall.setDataSource(getActivity(), Uri.parse(uriString));
-                        mpBall.prepareAsync();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
+                    PlayAudio(getActivity(),mpBall,"ball1");
                 }
 
                 @Override
                 public void onAnimationEnd(Animator animator) {
                     /* delete the ball view */
                     int viewTag = (int)view.getTag();
-                   // Log.v(LOG_TAG,"viewTag = " + viewTag);
                     mColorBallLayout.removeView(view);
 
                     /*add paint view to current position*/
-                    Log.v(LOG_TAG,"add paint view to current position");
+                   //Log.v(LOG_TAG,"add paint view to current position");
                     ImageView paintDirty = new ImageView(getContext());
                     int dirtyResourceId = generateDirtyByTag(viewTag);
                     paintDirty.setImageResource(dirtyResourceId);
@@ -232,25 +211,15 @@ public class FragmentColorBall extends Fragment {
                     RelativeLayout.LayoutParams params1 = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
                     params1.leftMargin = (int)(targetX - opt.outWidth/2);
                     params1.topMargin  = (int)(targetY - opt.outHeight/2);
-                    //Log.v(LOG_TAG,"paintDirty.getWidth() = " + opt.outWidth + ",paintDirty.getHeight() " + opt.outHeight);
-                    //play water audio
-                    try {
-                        mpWater.reset();
-                        int id = getActivity().getResources().getIdentifier("water1", "raw", "com.jinshu.xuzhi.feeling");
-                        String uriString = CONSTANTS_RES_PREFIX + Integer.toString(id);
-                        Log.v(LOG_TAG,uriString);
-                        mpWater.setDataSource(getActivity(), Uri.parse(uriString));
-                        mpWater.prepareAsync();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+
+                    PlayAudio(getActivity(),mpWater,"water1");
                     mColorBallLayout.addView(paintDirty,params1);
 
 
 
-                    /*ask the question after click 10 times */
+                    /*show dialog after 10 times */
                     if (TotalClickTime % 10 == 0) {
-                        Log.v(LOG_TAG, "show question view");
+                        //Log.v(LOG_TAG, "show question view");
                         dialog.setAlpha(1.0f);
                     }
 
@@ -291,11 +260,9 @@ public class FragmentColorBall extends Fragment {
         }
 
     }
-    int generateDirtyByTag(int tag)
+    private int generateDirtyByTag(int tag)
     {
-        //Log.v(LOG_TAG,"tag  = " + tag);
         for (ColorDirtyPair colorDirtyPair : mColorDirtyPairList) {
-           // Log.v(LOG_TAG,"colorTag = " + colorDirtyPair.colorTag);
             if (colorDirtyPair.colorTag == tag)
             {
                 return (int)colorDirtyPair.dirtyResourceIdList.get(new Random().nextInt(colorDirtyPair.dirtyResourceIdList.size()));

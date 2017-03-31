@@ -11,47 +11,53 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:src = "@drawable/arrowleft7"
+            android:id = "@+id/arrowback"
+            android:layout_alignParentTop="true"
+            android:alpha="0.5"></ImageView>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:src = "@drawable/coral7"
             android:id = "@+id/coral"
             android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            />
-
-
+            android:layout_centerHorizontal="true"/>
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src = "@drawable/bubble101"
+            android:src = "@drawable/bubble60"
             android:layout_centerHorizontal="true"
             android:id = "@+id/fishhook"/>
-
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src = "@drawable/fishicon2"
+            android:src = "@drawable/fish1"
+            android:id = "@+id/fish1"
+            android:layout_centerInParent="true"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src = "@drawable/fish2"
+            android:id = "@+id/fish2"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src = "@drawable/fish3"
             android:id = "@+id/fish3"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"/>
-
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src = "@drawable/fishicon1"
-            android:id = "@+id/fish2"/>
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src = "@drawable/fishpink"
+            android:src = "@drawable/fish5"
             android:id = "@+id/fish5"
             android:layout_below="@+id/fish4"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
-
+            android:layout_alignParentBottom="true" />
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src = "@drawable/fishblue"
+            android:src = "@drawable/fish4"
             android:id = "@+id/fish4"
             android:layout_below="@+id/fish1"
             android:layout_alignParentLeft="true"
@@ -60,14 +66,11 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src = "@drawable/fishicon"
-            android:id = "@+id/fish1"
-            android:layout_below="@+id/fishhook"
+            android:src = "@drawable/fish6"
+            android:id = "@+id/fish6"
+            android:layout_below="@+id/fish1"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginTop="29dp" />
-
-
+            android:layout_alignParentStart="true" />
     </RelativeLayout>
 
 
