@@ -171,9 +171,6 @@ public class MenuFragment extends Fragment {
         public Dialog onCreateDialog(Bundle savedInstanceState)
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-
-            //LayoutInflater inflater = getActivity().getLayoutInflater();
-            //builder.setView(inflater.inflate(R.layout.dialog_edittext, null));
             builder.setTitle(R.string.payTitle);
             builder.setNegativeButton(R.string.payOptionAlipay, new DialogInterface.OnClickListener() {
                 @Override
