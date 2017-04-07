@@ -14,6 +14,7 @@ import android.widget.ImageView;
 
 import java.io.IOException;
 
+import c.b.BP;
 import tyrantgit.explosionfield.ExplosionField;
 
 
@@ -77,6 +78,7 @@ public class MainActivityFragment extends Fragment {
             }
         });
         Util.getScreenSize(getActivity());
+        BP.init("f914c1c8c3c77abf5acf235407c4cd6f");
         return rootView;
     }
 

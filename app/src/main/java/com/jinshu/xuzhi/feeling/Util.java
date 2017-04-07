@@ -27,6 +27,8 @@ public class Util {
     private final String LOG_TAG = this.getClass().getSimpleName();
     static final String CONSTANTS_RES_PREFIX = "android.resource://com.jinshu.xuzhi.feeling/";
     static final String IMAGE_FILE_NAME = "1111.jpg";
+    static int i = 0;
+    static Boolean fishingTag = false;
 
 
      static Uri getTempUri() {
@@ -39,6 +41,7 @@ public class Util {
      */
      static File getTempFile() {
         File file = new File(Environment.getExternalStorageDirectory(), IMAGE_FILE_NAME);
+         //Log.v("getTempFile","getTempFile" + i++);
         try {
             file.createNewFile();
         } catch (IOException e) {
@@ -173,7 +176,7 @@ public class Util {
     static boolean customFileExist()
     {
         File file = new File(Environment.getExternalStorageDirectory(), IMAGE_FILE_NAME);
-        if (file.exists())
+        if (file.exists() && (file.length() > 0))
         {
             return true;
         }

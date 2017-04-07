@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.jinshu.xuzhi.feeling.MainActivityFragment"
-    android:background="@drawable/background8"
+    android:background="@drawable/mainbackground10"
     >
 
     <ImageView
@@ -13,7 +13,7 @@
     android:layout_height="wrap_content"
     android:layout_centerHorizontal="true"
     android:layout_centerVertical="true"
-    android:src = "@drawable/example200"
+    android:src = "@drawable/wan250"
     android:id = "@+id/feelingImage"
     android:visibility="visible"/>
 

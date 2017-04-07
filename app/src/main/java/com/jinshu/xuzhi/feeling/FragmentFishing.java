@@ -35,6 +35,7 @@ import java.util.Random;
 
 import static com.jinshu.xuzhi.feeling.Util.CONSTANTS_RES_PREFIX;
 import static com.jinshu.xuzhi.feeling.Util.IMAGE_FILE_NAME;
+import static com.jinshu.xuzhi.feeling.Util.fishingTag;
 import static com.jinshu.xuzhi.feeling.Util.mScreenHeight;
 import static com.jinshu.xuzhi.feeling.Util.mScreenWidth;
 import static com.jinshu.xuzhi.feeling.Util.zoomImg;
@@ -50,6 +51,7 @@ public class FragmentFishing extends Fragment {
     private static View mRootView;
     private static ImageView fish1,fish2,fish3,fish4,fish5,fish6,fishHook,backArrow;
     static ObjectAnimator bubblePopUp,popUpAfterMove;
+    static Thread timerThread;
     static AnimatorSet set;
     private static  BitmapFactory.Options opt;
     private static ArrayList<Fish> mFishList= new ArrayList<Fish>();;
@@ -76,7 +78,10 @@ public class FragmentFishing extends Fragment {
     /*0.5s repeat timer*/
     static Handler handler = new Handler() {
         public void handleMessage(Message msg) {
-
+            if (!fishingTag) {
+                super.handleMessage(msg);
+                return;
+            }
             /*if fish meet the bubble ,bite it*/
             int x = (int)(fishHook.getX() + fishHook.getWidth()/2);
             int y =  (int)(fishHook.getY() + fishHook.getHeight()/2);
@@ -126,7 +131,9 @@ public class FragmentFishing extends Fragment {
         StartFishAnimation();
         bubblePopUp = ObjectAnimator.ofFloat(fishHook,"Y",mScreenHeight + 40,0).setDuration((mScreenHeight + 40)*10);
         bubblePopUp.start();
-        new Thread(new MyThread()).start();
+        fishingTag = true;
+        timerThread = new Thread(new MyThread());
+        timerThread.start();
         mpBubble.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             public void onPrepared(MediaPlayer mp) {
                 mp.start();
@@ -153,8 +160,8 @@ public class FragmentFishing extends Fragment {
                         /*Move fishhook to destination*/
                         long yDistance = (long)abs(fishHook.getY()-mClickY);
                         long xDistance = (long)abs(fishHook.getX()-mClickX);
-                        Log.v(LOG_TAG,"fishHook x = " + fishHook.getX() + ",fishHook y = "+ fishHook.getY() );
-                        Log.v(LOG_TAG,"mClickX = " + mClickX + ",mClickY = "+ mClickY );
+                        //Log.v(LOG_TAG,"fishHook x = " + fishHook.getX() + ",fishHook y = "+ fishHook.getY() );
+                        //Log.v(LOG_TAG,"mClickX = " + mClickX + ",mClickY = "+ mClickY );
                         long speed = yDistance > xDistance? yDistance:xDistance;
                         ObjectAnimator clickY = ObjectAnimator.ofFloat(fishHook,"Y",mClickY).setDuration(speed *5);
                         ObjectAnimator clickX = ObjectAnimator.ofFloat(fishHook,"X", mClickX).setDuration(speed *5);
@@ -438,8 +445,10 @@ public class FragmentFishing extends Fragment {
      }
     @Override
     public void onDestroy() {
+        fishingTag = false;
         mpBubble.release();
         mpEnough.release();
+
         Log.v(LOG_TAG, "onDestroy");
         super.onDestroy();
     }

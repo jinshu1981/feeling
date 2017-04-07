@@ -1,7 +1,10 @@
 <resources>
-    <string name="app_name">Feeling</string>
+    <string name="app_name">玩够了没</string>
     <string name="action_settings">Settings</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="payTitle">修改南瓜头像 0.5元/次</string>
+    <string name="payOptionAlipay">支付宝</string>
+    <string name="payOptionWechat">微信支付</string>
 </resources>

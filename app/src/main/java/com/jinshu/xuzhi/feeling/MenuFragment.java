@@ -1,13 +1,20 @@
 package com.jinshu.xuzhi.feeling;
 
 
+import android.Manifest;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -15,7 +22,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import java.io.File;
 
@@ -34,11 +45,24 @@ public class MenuFragment extends Fragment {
 
     private final String LOG_TAG = this.getClass().getSimpleName();
     final MediaPlayer mp  = new MediaPlayer();
-    final int SELECT_PIC = 1;
+    final static int SELECT_PIC = 1;
     static ImageView customPicture,photoFrame,delete;
+    static BmobPay bmobPay;
+    static MenuFragment mThis;
+    /*bomb 支付实现*/
+    // 此为微信支付插件的官方最新版本号,请在更新时留意更新说明
+    int PLUGINVERSION = 7;
 
+
+    EditText name, price, body, order;
+    Button go;
+    RadioGroup type;
+    //TextView tv;
+
+    ProgressDialog dialog;
     public MenuFragment() {
         // Required empty public constructor
+
     }
 
 
@@ -113,8 +137,9 @@ public class MenuFragment extends Fragment {
         customPicture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //调用系统相册，进入相册获取图片
-                goAlbumsAndCrop();
+                //付费 0.5元每次
+                new PayOptionDialogFragment().show(getFragmentManager(), "PayOptionDialogFragment");
+
             }
         });
 
@@ -128,7 +153,7 @@ public class MenuFragment extends Fragment {
                     Log.v(LOG_TAG,res.toString());
                     if (res)
                     {
-                        Log.v(LOG_TAG,"custom picture deleted" );
+                        //Log.v(LOG_TAG,"custom picture deleted" );
                         BitmapDrawable drawableBackground = (BitmapDrawable)getActivity().getResources().getDrawable(R.drawable.example100jpg);
                         customPicture.setImageBitmap(drawableBackground.getBitmap());
                         delete.setVisibility(View.GONE);
@@ -137,13 +162,42 @@ public class MenuFragment extends Fragment {
                 }
 
         });
-
+        bmobPay = new BmobPay(this.getActivity());
+        mThis = this;
         return rootView;
+    }
+    public static class PayOptionDialogFragment extends DialogFragment {
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState)
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+            //LayoutInflater inflater = getActivity().getLayoutInflater();
+            //builder.setView(inflater.inflate(R.layout.dialog_edittext, null));
+            builder.setTitle(R.string.payTitle);
+            builder.setNegativeButton(R.string.payOptionAlipay, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    //goAlbumsAndCrop();
+                    bmobPay.pay(true);
+
+                }
+            });
+            builder.setPositiveButton(R.string.payOptionWechat, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    bmobPay.pay(false);
+
+
+                }
+            });
+            return builder.create();
+        }
     }
     /**
      * 调用相册
      */
-    private void goAlbumsAndCrop() {
+    public static void goAlbumsAndCrop() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("image/*");
@@ -168,12 +222,12 @@ public class MenuFragment extends Fragment {
         intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());
         // 面部识别 这里用不上
         intent.putExtra("noFaceDetection", false);
-        startActivityForResult(intent, SELECT_PIC);
+        mThis.startActivityForResult(intent, SELECT_PIC);
     }
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.v(LOG_TAG,"requestCode = " + requestCode);
+        //Log.v(LOG_TAG,"requestCode = " + requestCode);
         if (data == null) {
             return;
         }
@@ -181,6 +235,7 @@ public class MenuFragment extends Fragment {
             case SELECT_PIC:
                 //获取图片后缩放图片并显示
                 File file = new File(Environment.getExternalStorageDirectory(), IMAGE_FILE_NAME);
+                //Log.v(LOG_TAG,"file exist " + file.exists());
                 if (file.exists()) {
                     Bitmap bitmap = decodeUriAsBitmap(getActivity(), Uri.fromFile(file));
                     // 把解析到的位图显示出来
@@ -189,6 +244,23 @@ public class MenuFragment extends Fragment {
                     delete.setVisibility(View.VISIBLE);
                 }
                 break;
+        }
+    }
+
+
+    private static final int REQUESTPERMISSION = 101;
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUESTPERMISSION) {
+            if (permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    bmobPay.installBmobPayPlugin("bp.db");
+                } else {
+                    //提示没有权限，安装不了
+                    Toast.makeText(getActivity(),"您拒绝了权限，这样无法安装支付插件",Toast.LENGTH_LONG).show();
+                }
+            }
         }
     }
 

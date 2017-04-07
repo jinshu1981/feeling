@@ -20,8 +20,7 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-
+    compile fileTree(include: ['*.jar', '*.so'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
@@ -31,4 +30,5 @@ dependencies {
     compile 'tyrantgit:explosionfield:1.0.1'
     compile 'com.android.support:support-v4:25.1.1'
     testCompile 'junit:junit:4.12'
+    compile files('src/main/libs/BmobPay_v3.1.1_170111.jar')
 }
